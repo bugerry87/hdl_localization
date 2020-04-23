@@ -1,39 +1,40 @@
-#include <mutex>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <mutex>
+#include <vector>
 
-#include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
-#include <tf_conversions/tf_eigen.h>
+#include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
+#include <tf_conversions/tf_eigen.h>
 
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 
 #include <pcl/filters/voxel_grid.h>
 
-#include <pclomp/ndt_omp.h>
-
-#include <hdl_localization/pose_estimator.hpp>
-
-
-namespace hdl_localization {
-
-class GlobalmapServerNodelet : public nodelet::Nodelet {
+namespace hdl_localization
+{
+class GlobalmapServerNodelet : public nodelet::Nodelet
+{
 public:
   using PointT = pcl::PointXYZI;
 
-  GlobalmapServerNodelet() {
-  }
-  virtual ~GlobalmapServerNodelet() {
+  GlobalmapServerNodelet()
+  {
   }
 
-  void onInit() override {
+  virtual ~GlobalmapServerNodelet()
+  {
+  }
+
+  void onInit() override
+  {
     nh = getNodeHandle();
     mt_nh = getMTNodeHandle();
     private_nh = getPrivateNodeHandle();
@@ -46,12 +47,20 @@ public:
   }
 
 private:
-  void initialize_params() {
+  void initialize_params()
+  {
     // read globalmap from a pcd file
-    std::string globalmap_pcd = private_nh.param<std::string>("globalmap_pcd", "");
+    std::vector<std::string> globalmaps_pcd;
+    private_nh.param("globalmaps_pcd", globalmaps_pcd, {""});
     globalmap.reset(new pcl::PointCloud<PointT>());
-    pcl::io::loadPCDFile(globalmap_pcd, *globalmap);
     globalmap->header.frame_id = "map";
+
+    for (auto submap_pcd : globalmaps_pcd)
+    {
+      pcl::PointCloud<PointT> submap;
+      pcl::io::loadPCDFile(submap_pcd, submap);
+      globalmap->points.insert(globalmap->points.end(), submap.points.begin(), submap.points.end());
+    }
 
     // downsample globalmap
     double downsample_resolution = private_nh.param<double>("downsample_resolution", 0.1);
@@ -76,7 +85,6 @@ private:
   pcl::PointCloud<PointT>::Ptr globalmap;
 };
 
-}
-
+}  // namespace hdl_localization
 
 PLUGINLIB_EXPORT_CLASS(hdl_localization::GlobalmapServerNodelet, nodelet::Nodelet)
