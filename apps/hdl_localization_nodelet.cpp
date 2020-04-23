@@ -1,5 +1,4 @@
 #include <mutex>
-#include <memory>
 #include <iostream>
 #include <boost/circular_buffer.hpp>
 

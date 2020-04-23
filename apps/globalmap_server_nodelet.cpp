@@ -1,16 +1,9 @@
-#include <iostream>
-#include <memory>
-#include <mutex>
 #include <vector>
 
 #include <pcl_ros/point_cloud.h>
 #include <ros/ros.h>
-#include <tf/transform_broadcaster.h>
-#include <tf_conversions/tf_eigen.h>
 
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <nav_msgs/Odometry.h>
-#include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 
 #include <nodelet/nodelet.h>

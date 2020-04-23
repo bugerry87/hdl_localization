@@ -1,13 +1,10 @@
 #ifndef POSE_ESTIMATOR_HPP
 #define POSE_ESTIMATOR_HPP
 
-#include <memory>
 #include <ros/ros.h>
+
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-
-#include <pclomp/ndt_omp.h>
-#include <pcl/filters/voxel_grid.h>
 
 #include <hdl_localization/pose_system.hpp>
 #include <kkl/alg/unscented_kalman_filter.hpp>
