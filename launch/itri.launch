@@ -41,10 +41,10 @@
         <param name="init_pos_x" value="-263.5926208496094" />
         <param name="init_pos_y" value="-67.85790252685547" />
         <param name="init_pos_z" value="-9.890708923339844" />
-        <param name="init_ori_x" value="0" />
-        <param name="init_ori_y" value="0" />
-        <param name="init_ori_z" value="-0.89071035" />
-        <param name="init_ori_w" value="0.4539951" />
+        <param name="init_ori_x" value="-0.011703" />
+        <param name="init_ori_y" value="-0.019661" />
+        <param name="init_ori_z" value="-0.89071" />
+        <param name="init_ori_w" value="0.453995" />
     </node>
     
     <!-- Run Rviz-->

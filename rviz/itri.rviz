@@ -29,6 +29,7 @@ Panels:
   - Class: rviz/Views
     Expanded:
       - /Current View1
+      - /StartPoint1/Focal Point1
     Name: Views
     Splitter Ratio: 0.5
   - Class: rviz/Time
@@ -303,26 +304,66 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 42.362213134765625
+      Distance: 84.0038070678711
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -263.5926208496094
+        Y: -67.85790252685547
+        Z: -9.890701293945312
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7853981852531433
-      Target Frame: velodyne
+      Pitch: 1.1453980207443237
+      Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.7853981852531433
-    Saved: ~
+      Yaw: 2.275397777557373
+    Saved:
+      - Class: rviz/Orbit
+        Distance: 84.0038070678711
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.05999999865889549
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: -263.5926208496094
+          Y: -67.85790252685547
+          Z: -9.890701293945312
+        Focal Shape Fixed Size: false
+        Focal Shape Size: 0.05000000074505806
+        Invert Z Axis: false
+        Name: StartPoint
+        Near Clip Distance: 0.009999999776482582
+        Pitch: 1.1453980207443237
+        Target Frame: <Fixed Frame>
+        Value: Orbit (rviz)
+        Yaw: 2.275397777557373
+      - Class: rviz/Orbit
+        Distance: 84.0038070678711
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.05999999865889549
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0
+          Y: 0
+          Z: 0
+        Focal Shape Fixed Size: false
+        Focal Shape Size: 0.05000000074505806
+        Invert Z Axis: false
+        Name: Follower
+        Near Clip Distance: 0.009999999776482582
+        Pitch: 1.1453980207443237
+        Target Frame: velodyne
+        Value: Orbit (rviz)
+        Yaw: 0
 Window Geometry:
   Displays:
     collapsed: false
