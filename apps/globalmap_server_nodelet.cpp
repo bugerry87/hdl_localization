@@ -46,7 +46,7 @@ private:
     std::vector<std::string> globalmaps_pcd;
     private_nh.param("globalmaps_pcd", globalmaps_pcd, {""});
     globalmap.reset(new pcl::PointCloud<PointT>());
-    globalmap->header.frame_id = "map";
+    globalmap->header.frame_id = private_nh.param<std::string>("map_frame", "map");
 
     for (auto submap_pcd : globalmaps_pcd)
     {
