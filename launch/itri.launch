@@ -7,6 +7,7 @@
     <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
     <arg name="points_topic" default="/lidar_points" />
     <arg name="imu_topic" default="/imu/data" />
+    <arg name="base_link" default="base_link" />
     <arg name="odom_child_frame_id" default="base_link" />
     <arg name="map_frame_id" default="world" />
     <arg name="maps" default="[/share/itri/map.pcd]" />
@@ -16,10 +17,10 @@
     <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
 
     <!-- Setup tf tree -->
-    <node pkg="tf" type="static_transform_publisher" name="world-base_link" args="0 0 0 0 0 1 1 world $(arg odom_child_frame_id) 10"/>
-    <node pkg="tf" type="static_transform_publisher" name="base_link-velodyne" args="0 0 0 0 0 1 1 $(arg odom_child_frame_id) velodyne 10"/>
-    <node pkg="tf" type="static_transform_publisher" name="base_link-gps" args="0 0 0 0 0 1 1 $(arg odom_child_frame_id) gps 10"/>
-    <node pkg="tf" type="static_transform_publisher" name="base_link-imu" args="0 0 0 0 0 1 1 $(arg odom_child_frame_id) imu 10"/>
+    <!--<node pkg="tf" type="static_transform_publisher" name="world_base_link" args="0 0 0 0 0 0 1 $(arg map_frame_id) $(arg base_link) 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_link_velodyne" args="0 0 0 0 0 0 1 $(arg base_link) velodyne 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_link_gps" args="0 0 0 0 0 0 1 $(arg base_link) gps 10"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_link_imu" args="0 0 0 0 0 0 1 $(arg base_link) imu 10"/>-->
   
     <!-- globalmap_server_nodelet -->
     <node pkg="nodelet" type="nodelet" name="globalmap_server_nodelet" args="load hdl_localization/GlobalmapServerNodelet $(arg nodelet_manager)">
@@ -33,6 +34,7 @@
         <remap from="/velodyne_points" to="$(arg points_topic)" />
         <remap from="/gpsimu_driver/imu_data" to="$(arg imu_topic)" />
         <!-- odometry frame_id -->
+        <param name="map_frame_id" value="$(arg map_frame_id)" />
         <param name="odom_child_frame_id" value="$(arg odom_child_frame_id)" />
         <!-- imu settings -->
         <!-- during "cool_time", imu inputs are ignored -->

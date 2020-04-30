@@ -15,6 +15,7 @@ Panels:
         - /Odometry1
         - /MarkerArray1/Namespaces1
         - /MarkerArray2
+        - /world1
       Splitter Ratio: 0.5
     Tree Height: 317
   - Class: rviz/Selection
@@ -36,7 +37,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Map PC
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -67,13 +68,34 @@ Visualization Manager:
       Frame Timeout: 50
       Frames:
         All Enabled: true
+        base_link:
+          Value: true
+        gps:
+          Value: true
+        imu:
+          Value: true
+        map:
+          Value: true
+        velodyne:
+          Value: true
+        world:
+          Value: true
       Marker Scale: 4
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        world:
+          base_link:
+            gps:
+              {}
+            imu:
+              {}
+            map:
+              {}
+            velodyne:
+              {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -275,6 +297,13 @@ Visualization Manager:
       Namespaces:
         {}
       Queue Size: 100
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: world
+      Radius: 0.10000000149011612
+      Reference Frame: <Fixed Frame>
       Value: true
   Enabled: true
   Global Options:
