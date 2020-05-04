@@ -8,12 +8,8 @@ Panels:
         - /Status1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /Input PC1
-        - /Input PC1/Status1
-        - /CalibratedPC1
-        - /CalibratedPC1/Status1
       Splitter Ratio: 0.5
-    Tree Height: 317
+    Tree Height: 629
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -33,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Map PC
+    SyncSource: Global Map PC
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -104,17 +100,17 @@ Visualization Manager:
         Min Value: -10
         Value: true
       Axis: Z
-      Channel Name: intensity
+      Channel Name: z
       Class: rviz/PointCloud2
-      Color: 255; 128; 255
-      Color Transformer: FlatColor
+      Color: 128; 255; 255
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 100
-      Min Color: 0; 0; 0
-      Min Intensity: 0
+      Max Color: 50; 0; 0
+      Max Intensity: 11.777359962463379
+      Min Color: 255; 0; 0
+      Min Intensity: -5.129133701324463
       Name: Input PC
       Position Transformer: XYZ
       Queue Size: 10
@@ -125,7 +121,37 @@ Visualization Manager:
       Topic: /lidar_points
       Unreliable: false
       Use Fixed Frame: true
-      Use rainbow: true
+      Use rainbow: false
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: z
+      Class: rviz/PointCloud2
+      Color: 0; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 0; 0; 0
+      Max Intensity: 7.384625434875488
+      Min Color: 255; 0; 0
+      Min Intensity: -4.247158050537109
+      Name: Truncuated PC
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic: /Initializer/trunc
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: false
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -142,17 +168,47 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 45.99229049682617
-      Min Color: 128; 128; 128
-      Min Intensity: -30.583576202392578
-      Name: Map PC
+      Max Intensity: 45.4719123840332
+      Min Color: 0; 0; 0
+      Min Intensity: -30.54375648498535
+      Name: Global Map PC
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 3
+      Size (Pixels): 1
       Size (m): 0.05000000074505806
       Style: Points
-      Topic: /globalmap
+      Topic: /sampled_map
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: false
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: z
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 0; 255; 0
+      Max Intensity: 8.130230903625488
+      Min Color: 50; 50; 50
+      Min Intensity: -10.34752082824707
+      Name: Local Map PC
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 1
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic: /Initializer/submap
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: false
@@ -166,7 +222,7 @@ Visualization Manager:
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
-      Color: 255; 0; 255
+      Color: 0; 255; 255
       Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
@@ -175,11 +231,11 @@ Visualization Manager:
       Max Intensity: 100
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: Aligned PC
+      Name: NDT PC
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 3
+      Size (Pixels): 5
       Size (m): 0.05000000074505806
       Style: Points
       Topic: /aligned_points
@@ -222,44 +278,64 @@ Visualization Manager:
       Unreliable: false
       Value: true
     - Alpha: 1
-      Class: rviz/PointStamped
-      Color: 0; 200; 200
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz/PoseWithCovariance
+      Color: 0; 255; 255
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
       Enabled: true
-      History Length: 1000
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
       Name: GPS
-      Radius: 5
-      Topic: Initializer/gps
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
+      Topic: /Initializer/guess
       Unreliable: false
       Value: true
     - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: ""
-      Decay Time: 0
+      Axes Length: 2
+      Axes Radius: 0.20000000298023224
+      Class: rviz/PoseWithCovariance
+      Color: 255; 25; 0
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
       Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 4096
-      Min Color: 0; 0; 0
-      Min Intensity: 0
-      Name: CalibratedPC
-      Position Transformer: ""
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Points
-      Topic: /points_calibrated
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Initial Guess
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Axes
+      Topic: /Initializer/init
       Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
       Value: true
   Enabled: true
   Global Options:
@@ -289,25 +365,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 20.158323287963867
+      Distance: 26.353914260864258
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -263.5926208496094
-        Y: -67.85790252685547
-        Z: -9.890701293945312
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.1453980207443237
-      Target Frame: <Fixed Frame>
+      Pitch: 1.1153979301452637
+      Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 2.275397777557373
+      Yaw: 1.4149999618530273
     Saved:
       - Class: rviz/Orbit
         Distance: 84.0038070678711
@@ -352,10 +428,10 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 608
+  Height: 920
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000020f000001c0fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000001c0000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f000001c0fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000001c0000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004f500000040fc0100000002fb0000000800540069006d00650100000000000004f5000002eb00fffffffb0000000800540069006d00650100000000000004500000000000000000000001cb000001c000000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000020f000002f8fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002f8000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f000002f8fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000002f8000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073d00000040fc0100000002fb0000000800540069006d006501000000000000073d000002eb00fffffffb0000000800540069006d0065010000000000000450000000000000000000000413000002f800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -364,6 +440,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1269
+  Width: 1853
   X: 67
   Y: 27

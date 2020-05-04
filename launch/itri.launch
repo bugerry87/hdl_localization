@@ -12,7 +12,7 @@
     <arg name="odom_child_frame_id" default="base_link" />
     <arg name="map_frame_id" default="world" />
     <arg name="maps" default="[/share/itri/map.pcd]" />
-    <arg name="map_resolution" default="0.5" />
+    <arg name="map_resolution" default="2.0" />
 
     <!-- in case you use velodyne_driver, comment out the following line -->
     <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
@@ -23,33 +23,22 @@
         name="Initializer"
         type="initializer.py"
         output="screen"
-        args="-n Initializer -g $(arg gps_topic) -i $(arg imu_topic) -p $(arg points_topic) -f $(arg map_frame_id)"
+        args="-g $(arg gps_topic) -m '/globalmap' -p $(arg points_topic) -f $(arg map_frame_id) -r 40 -t -1.5 1.5"
     />
-
-    <node pkg="multi_lidar_calibrator" type="multi_lidar_calibrator" name="multi_lidar_calibrator" output="screen">
-        <param name="points_parent_src" value="/globalmap"/>
-        <param name="points_child_src" value="$(arg points_topic)"/>
-        <param name="x" value="-263.0" />
-        <param name="y" value="-67.0" />
-        <param name="z" value="-9.0" />
-        <param name="roll" value="0.0" />
-        <param name="pitch" value="0.0" />
-        <param name="yaw" value="-2.0" />
-    </node>
 
     <!-- hdl_localization_nodelet -->
     <node pkg="nodelet" type="nodelet" name="hdl_localization_nodelet" args="load hdl_localization/HdlLocalizationNodelet $(arg nodelet_manager)">
         <remap from="/velodyne_points" to="$(arg points_topic)" />
-        <remap from="/gpsimu_driver/imu_data" to="$(arg imu_topic)" />
-        <remap from="/initialpose" to="/nothing" />
+        <remap from="/guesses" to="None" />
+        <remap from="/initialpose" to="None" />
+        <!--<remap from="/globalmap" to="Initializer/submap" />-->
         <!-- odometry frame_id -->
         <param name="map_frame_id" value="$(arg map_frame_id)" />
         <param name="odom_child_frame_id" value="$(arg odom_child_frame_id)" />
         <!-- imu settings -->
         <!-- during "cool_time", imu inputs are ignored -->
-        <param name="use_imu" value="false" />
-        <param name="invert_imu" value="true" />
-        <param name="cool_time_duration" value="2.0" />
+        <param name="use_guesses" value="false" />
+        <param name="cool_time_duration" value="1.0" />
         <!-- ndt settings -->
         <!-- if NDT is slow for your PC, try DIRECT1 serach method, which is a bit unstable but extremely fast -->
         <param name="ndt_neighbor_search_method" value="DIRECT7" />

@@ -3,8 +3,8 @@
 
 #include <ros/ros.h>
 
-#include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 
 #include <hdl_localization/pose_system.hpp>
 #include <kkl/alg/unscented_kalman_filter.hpp>
@@ -26,11 +26,11 @@ public:
    * @param quat                initial orientation
    * @param cool_time_duration  during "cool time", prediction is not performed
    */
-  PoseEstimator(pcl::Registration<PointT, PointT>::Ptr& registration, const ros::Time& stamp, const Eigen::Vector3f& pos, const Eigen::Quaternionf& quat, double cool_time_duration = 1.0)
-    : init_stamp(stamp),
-      registration(registration),
-      cool_time_duration(cool_time_duration)
-  {
+  PoseEstimator(pcl::Registration<PointT, PointT>::Ptr &registration,
+                const ros::Time &stamp, const Eigen::Vector3f &pos,
+                const Eigen::Quaternionf &quat, double cool_time_duration = 1.0)
+      : init_stamp(stamp), registration(registration),
+        cool_time_duration(cool_time_duration) {
     process_noise = Eigen::MatrixXf::Identity(16, 16);
     process_noise.middleRows(0, 3) *= 1.0;
     process_noise.middleRows(3, 3) *= 1.0;
@@ -45,14 +45,16 @@ public:
     Eigen::VectorXf mean(16);
     mean.middleRows(0, 3) = pos;
     mean.middleRows(3, 3).setZero();
-    mean.middleRows(6, 4) = Eigen::Vector4f(quat.w(), quat.x(), quat.y(), quat.z());
+    mean.middleRows(6, 4) =
+        Eigen::Vector4f(quat.w(), quat.x(), quat.y(), quat.z());
     mean.middleRows(10, 3).setZero();
     mean.middleRows(13, 3).setZero();
 
-    Eigen::MatrixXf cov = Eigen::MatrixXf::Identity(16, 16) * 0.01;
+    Eigen::MatrixXf cov = Eigen::MatrixXf::Identity(16, 16) * 0.001;
 
     PoseSystem system;
-    ukf.reset(new kkl::alg::UnscentedKalmanFilterX<float, PoseSystem>(system, 16, 6, 7, process_noise, measurement_noise, mean, cov));
+    ukf.reset(new kkl::alg::UnscentedKalmanFilterX<float, PoseSystem>(
+        system, 16, 6, 7, process_noise, measurement_noise, mean, cov));
   }
 
   /**
@@ -61,8 +63,10 @@ public:
    * @param acc      acceleration
    * @param gyro     angular velocity
    */
-  void predict(const ros::Time& stamp, const Eigen::Vector3f& acc, const Eigen::Vector3f& gyro) {
-    if((stamp - init_stamp).toSec() < cool_time_duration || prev_stamp.is_zero() || prev_stamp == stamp) {
+  void predict(const ros::Time &stamp, const Eigen::Vector3f &pos,
+               const Eigen::Vector4f &ori) {
+    if ((stamp - init_stamp).toSec() < cool_time_duration ||
+        prev_stamp.is_zero() || prev_stamp == stamp) {
       prev_stamp = stamp;
       return;
     }
@@ -73,9 +77,9 @@ public:
     ukf->setProcessNoiseCov(process_noise * dt);
     ukf->system.dt = dt;
 
-    Eigen::VectorXf control(6);
-    control.head<3>() = acc;
-    control.tail<3>() = gyro;
+    Eigen::VectorXf control(7);
+    control.head<3>() = pos;
+    control.tail<4>() = ori;
 
     ukf->predict(control);
   }
@@ -85,7 +89,8 @@ public:
    * @param cloud   input cloud
    * @return cloud aligned to the globalmap
    */
-  pcl::PointCloud<PointT>::Ptr correct(const pcl::PointCloud<PointT>::ConstPtr& cloud) {
+  pcl::PointCloud<PointT>::Ptr
+  correct(const pcl::PointCloud<PointT>::ConstPtr &cloud) {
     Eigen::Matrix4f init_guess = Eigen::Matrix4f::Identity();
     init_guess.block<3, 3>(0, 0) = quat().toRotationMatrix();
     init_guess.block<3, 1>(0, 3) = pos();
@@ -98,7 +103,7 @@ public:
     Eigen::Vector3f p = trans.block<3, 1>(0, 3);
     Eigen::Quaternionf q(trans.block<3, 3>(0, 0));
 
-    if(quat().coeffs().dot(q.coeffs()) < 0.0f) {
+    if (quat().coeffs().dot(q.coeffs()) < 0.0f) {
       q.coeffs() *= -1.0f;
     }
 
@@ -120,7 +125,9 @@ public:
   }
 
   Eigen::Quaternionf quat() const {
-    return Eigen::Quaternionf(ukf->mean[6], ukf->mean[7], ukf->mean[8], ukf->mean[9]).normalized();
+    return Eigen::Quaternionf(ukf->mean[6], ukf->mean[7], ukf->mean[8],
+                              ukf->mean[9])
+        .normalized();
   }
 
   Eigen::Matrix4f matrix() const {
@@ -131,9 +138,9 @@ public:
   }
 
 private:
-  ros::Time init_stamp;         // when the estimator was initialized
-  ros::Time prev_stamp;         // when the estimator was updated last time
-  double cool_time_duration;    //
+  ros::Time init_stamp;      // when the estimator was initialized
+  ros::Time prev_stamp;      // when the estimator was updated last time
+  double cool_time_duration; //
 
   Eigen::MatrixXf process_noise;
   std::unique_ptr<kkl::alg::UnscentedKalmanFilterX<float, PoseSystem>> ukf;
@@ -141,6 +148,6 @@ private:
   pcl::Registration<PointT, PointT>::Ptr registration;
 };
 
-}
+} // namespace hdl_localization
 
 #endif // POSE_ESTIMATOR_HPP

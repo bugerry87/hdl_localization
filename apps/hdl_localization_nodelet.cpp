@@ -43,12 +43,11 @@ public:
     odom_child_frame_id =
         private_nh.param<std::string>("odom_child_frame_id", "base_link");
 
-    use_imu = private_nh.param<bool>("use_imu", true);
-    invert_imu = private_nh.param<bool>("invert_imu", false);
-    if (use_imu) {
-      NODELET_INFO("enable imu-based prediction");
-      imu_sub = mt_nh.subscribe("/gpsimu_driver/imu_data", 256,
-                                &HdlLocalizationNodelet::imu_callback, this);
+    use_guesses = private_nh.param<bool>("use_guesses", true);
+    if (use_guesses) {
+      NODELET_INFO("enable guess-based prediction");
+      guess_sub = mt_nh.subscribe(
+          "/guess", 256, &HdlLocalizationNodelet::guess_callback, this);
     }
     points_sub = mt_nh.subscribe(
         "/velodyne_points", 5, &HdlLocalizationNodelet::points_callback, this);
@@ -116,12 +115,18 @@ private:
 
 private:
   /**
-   * @brief callback for imu data
-   * @param imu_msg
+   * @brief callback for guesses
+   * @param pose
    */
-  void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg) {
-    std::lock_guard<std::mutex> lock(imu_data_mutex);
-    imu_data.push_back(imu_msg);
+  void
+  guess_callback(const geometry_msgs::PoseWithCovarianceStampedConstPtr pose) {
+    std::lock_guard<std::mutex> lock(pose_estimator_mutex);
+    auto p = pose->pose.pose.position;
+    auto o = pose->pose.pose.orientation;
+    auto stamp = pose->header.stamp;
+    Eigen::Vector3f pos(p.x, p.y, p.z);
+    Eigen::Vector4f ori(o.w, o.x, o.y, o.z);
+    pose_estimator->predict(stamp, pos, ori);
   }
 
   /**
@@ -163,30 +168,13 @@ private:
       return;
     }
 
-    auto filtered = downsample(cloud);
-
     // predict
-    if (!use_imu) {
-      pose_estimator->predict(stamp, Eigen::Vector3f::Zero(),
-                              Eigen::Vector3f::Zero());
-    } else {
-      std::lock_guard<std::mutex> lock(imu_data_mutex);
-      auto imu_iter = imu_data.begin();
-      for (imu_iter; imu_iter != imu_data.end(); imu_iter++) {
-        if (stamp < (*imu_iter)->header.stamp) {
-          break;
-        }
-        const auto &acc = (*imu_iter)->linear_acceleration;
-        const auto &gyro = (*imu_iter)->angular_velocity;
-        double gyro_sign = invert_imu ? -1.0 : 1.0;
-        pose_estimator->predict(
-            (*imu_iter)->header.stamp, Eigen::Vector3f(acc.x, acc.y, acc.z),
-            gyro_sign * Eigen::Vector3f(gyro.x, gyro.y, gyro.z));
-      }
-      imu_data.erase(imu_data.begin(), imu_iter);
-    }
+    auto q = pose_estimator->quat();
+    Eigen::Vector4f ori(q.w(), q.x(), q.y(), q.z());
+    pose_estimator->predict(stamp, pose_estimator->pos(), ori);
 
     // correct
+    auto filtered = downsample(cloud);
     auto t1 = ros::WallTime::now();
     auto aligned = pose_estimator->correct(filtered);
     auto t2 = ros::WallTime::now();
@@ -326,9 +314,8 @@ private:
   std::string map_frame_id;
   std::string odom_child_frame_id;
 
-  bool use_imu;
-  bool invert_imu;
-  ros::Subscriber imu_sub;
+  bool use_guesses;
+  ros::Subscriber guess_sub;
   ros::Subscriber points_sub;
   ros::Subscriber globalmap_sub;
   ros::Subscriber initialpose_sub;
@@ -337,10 +324,6 @@ private:
   ros::Publisher aligned_pub;
   tf::TransformBroadcaster pose_broadcaster;
   tf::TransformListener tf_listener;
-
-  // imu input buffer
-  std::mutex imu_data_mutex;
-  std::vector<sensor_msgs::ImuConstPtr> imu_data;
 
   // globalmap and registration method
   pcl::PointCloud<PointT>::Ptr globalmap;
