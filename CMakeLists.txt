@@ -64,3 +64,9 @@ target_link_libraries(globalmap_server_nodelet
   ${PCL_LIBRARIES}
 )
 
+add_library(dynamicmap_server_nodelet apps/dynamicmap_server_nodelet.cpp)
+target_link_libraries(dynamicmap_server_nodelet
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+

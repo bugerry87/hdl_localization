@@ -5,6 +5,7 @@
   <description>The hdl_localization package</description>
 
   <maintainer email="koide@aisl.cs.tut.ac.jp">koide</maintainer>
+  <maintainer email="gerald.baulig@gmail.com">bugerry87</maintainer>
 
   <license>BSD</license>
 
@@ -14,6 +15,7 @@
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
   <build_depend>ndt_omp</build_depend>
   <run_depend>nodelet</run_depend>
   <run_depend>pcl_ros</run_depend>

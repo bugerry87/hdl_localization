@@ -5,3 +5,7 @@
 <library path="lib/libglobalmap_server_nodelet">
 <class name="hdl_localization/GlobalmapServerNodelet" type="hdl_localization::GlobalmapServerNodelet" base_class_type="nodelet::Nodelet" />
 </library>
+
+<library path="lib/libdynamicmap_server_nodelet">
+<class name="hdl_localization/DynamicmapServerNodelet" type="hdl_localization::DynamicmapServerNodelet" base_class_type="nodelet::Nodelet" />
+</library>

@@ -12,6 +12,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <std_msgs/Float64.h>
 
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
@@ -59,6 +60,7 @@ public:
     pose_pub = nh.advertise<nav_msgs::Odometry>("/odom", 5, false);
     aligned_pub =
         nh.advertise<sensor_msgs::PointCloud2>("/aligned_points", 5, false);
+    score_pub = nh.advertise<std_msgs::Float64>("/score", 5, false);
   }
 
 private:
@@ -178,13 +180,12 @@ private:
     auto t1 = ros::WallTime::now();
     auto aligned = pose_estimator->correct(filtered);
     auto t2 = ros::WallTime::now();
+    score_pub.publish(pose_estimator->score);
 
     processing_time.push_back((t2 - t1).toSec());
     double avg_processing_time =
         std::accumulate(processing_time.begin(), processing_time.end(), 0.0) /
         processing_time.size();
-    // NODELET_INFO_STREAM("processing_time: " << avg_processing_time * 1000.0
-    // << "[msec]");
 
     if (aligned_pub.getNumSubscribers()) {
       aligned->header.frame_id = map_frame_id;
@@ -322,6 +323,7 @@ private:
 
   ros::Publisher pose_pub;
   ros::Publisher aligned_pub;
+  ros::Publisher score_pub;
   tf::TransformBroadcaster pose_broadcaster;
   tf::TransformListener tf_listener;
 

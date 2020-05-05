@@ -3,15 +3,17 @@
     <!-- Let's use sim time! -->
     <param name="/use_sim_time" value="true"/>
 
+    <node name="world" pkg="tf" type="static_transform_publisher" respawn="true" args="0 0 0 0 0 0 1 world car 100"/>
+
     <!-- arguments -->
     <arg name="nodelet_manager" default="velodyne_nodelet_manager" />
     <arg name="points_topic" default="/lidar_points" />
     <arg name="imu_topic" default="/imu/data" />
     <arg name="gps_topic" default="/fix" />
-    <arg name="base_link" default="base_link" />
-    <arg name="odom_child_frame_id" default="base_link" />
+    <arg name="base_link" default="car" />
+    <arg name="odom_child_frame_id" default="car" />
     <arg name="map_frame_id" default="world" />
-    <arg name="maps" default="[/share/itri/map.pcd]" />
+    <arg name="maps" default="/share/nuscene/map/" />
     <arg name="map_resolution" default="2.0" />
 
     <!-- in case you use velodyne_driver, comment out the following line -->
@@ -23,7 +25,7 @@
         name="Initializer"
         type="initializer.py"
         output="screen"
-        args="-g $(arg gps_topic) -i $(arg imu_topic) -m '/globalmap' -p $(arg points_topic) -o /odom -s /score -f $(arg map_frame_id) -r 40 -t -1.5 1.5 --min_score=0.1"
+        args="-g $(arg gps_topic) -i $(arg imu_topic) -m '/dynamic_map' -p $(arg points_topic) -o /odom -s /score -f $(arg map_frame_id) -r 0 -t -1.5 1.5 --min_score=0.1"
     />
 
     <!-- hdl_localization_nodelet -->
@@ -31,7 +33,7 @@
         <remap from="/velodyne_points" to="$(arg points_topic)" />
         <remap from="/initialpose" to="Initializer/init" />
         <remap from="/guesses" to="Initializer/guess" />
-        <!--<remap from="/globalmap" to="Initializer/submap" />-->
+        <remap from="/globalmap" to="/dynamic_map" />
         <!-- odometry frame_id -->
         <param name="map_frame_id" value="$(arg map_frame_id)" />
         <param name="odom_child_frame_id" value="$(arg odom_child_frame_id)" />
@@ -47,15 +49,23 @@
         <!-- if "specify_init_pose" is true, pose estimator will be initialized with the following params -->
         <!-- otherwise, you need to input an initial pose with "2D Pose Estimate" on rviz" -->
         <param name="specify_init_pose" value="false" />
+        <param name="init_pos_x" value="-263.5926208496094" />
+        <param name="init_pos_y" value="-67.85790252685547" />
+        <param name="init_pos_z" value="-9.890708923339844" />
+        <param name="init_ori_x" value="-0.011703" />
+        <param name="init_ori_y" value="-0.019661" />
+        <param name="init_ori_z" value="-0.89071" />
+        <param name="init_ori_w" value="0.453995" />
     </node>
     
     <!-- Run Rviz-->
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find hdl_localization)/rviz/itri.rviz" />
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find hdl_localization)/rviz/nuscene.rviz" />
 
     <!-- globalmap_server_nodelet -->
-    <node pkg="nodelet" type="nodelet" name="globalmap_server_nodelet" args="load hdl_localization/GlobalmapServerNodelet $(arg nodelet_manager)">
-        <rosparam param="globalmaps_pcd" subst_value="True">$(arg maps)</rosparam>
+    <node pkg="nodelet" type="nodelet" name="dynamicmap_server_nodelet" args="load hdl_localization/DynamicmapServerNodelet $(arg nodelet_manager)">
         <param name="map_frame" value="$(arg map_frame_id)" />
+        <param name="prefix" value="$(arg maps)" />
         <param name="downsample_resolution" value="$(arg map_resolution)" />
+        <remap from="/initialpose" to="Initializer/guess" />
     </node>
 </launch>

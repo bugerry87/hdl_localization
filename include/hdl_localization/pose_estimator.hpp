@@ -17,6 +17,7 @@ namespace hdl_localization {
 class PoseEstimator {
 public:
   using PointT = pcl::PointXYZI;
+  double score;
 
   /**
    * @brief constructor
@@ -98,6 +99,7 @@ public:
     pcl::PointCloud<PointT>::Ptr aligned(new pcl::PointCloud<PointT>());
     registration->setInputSource(cloud);
     registration->align(*aligned, init_guess);
+    score = registration->getFitnessScore() / cloud->size();
 
     Eigen::Matrix4f trans = registration->getFinalTransformation();
     Eigen::Vector3f p = trans.block<3, 1>(0, 3);

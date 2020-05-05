@@ -3,7 +3,6 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/ros.h>
 
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/PointCloud2.h>
 
 #include <nodelet/nodelet.h>
