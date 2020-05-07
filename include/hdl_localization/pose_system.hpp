@@ -25,12 +25,14 @@ public:
   VectorXt f(const VectorXt &state, const VectorXt &control) const {
     VectorXt next_state(16);
 
-    next_state.middleRows(0, 3) = control.middleRows(0, 3);
-    Quaterniont qt_(control[3], control[4], control[5], control[6]);
+    next_state.middleRows(0, 3) = state.middleRows(0, 3);
+    Quaterniont qt_(state[3], state[4], state[5], state[6]);
     qt_.normalize();
+    next_state.middleRows(3, 1) =
+        control.middleRows(0, 3) - state.middleRows(0, 3);
     next_state.middleRows(6, 4) << qt_.w(), qt_.x(), qt_.y(), qt_.z();
 
-    return next_state;
+    return state;
   }
 
   // observation equation

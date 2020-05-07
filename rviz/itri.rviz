@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /TF1/Frames1
         - /TF1/Tree1
+        - /Odometry1
         - /Marker1
       Splitter Ratio: 0.5
     Tree Height: 629
@@ -23,6 +24,7 @@ Panels:
   - Class: rviz/Views
     Expanded:
       - /Current View1
+      - /StartPoint1
       - /StartPoint1/Focal Point1
     Name: Views
     Splitter Ratio: 0.5
@@ -112,7 +114,7 @@ Visualization Manager:
           Value: true
         Value: true
       Enabled: true
-      Keep: 100
+      Keep: 10000
       Name: Odometry
       Position Tolerance: 0.10000000149011612
       Shape:
@@ -373,7 +375,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/XYOrbit
+      Class: rviz/Orbit
       Distance: 10
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -389,10 +391,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8753981590270996
+      Pitch: 0.7853981852531433
       Target Frame: base_link
-      Value: XYOrbit (rviz)
-      Yaw: 1.2703980207443237
+      Value: Orbit (rviz)
+      Yaw: 0.7853981852531433
     Saved:
       - Class: rviz/Orbit
         Distance: 84.0038070678711

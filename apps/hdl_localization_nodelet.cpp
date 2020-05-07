@@ -173,7 +173,8 @@ private:
     // predict
     auto q = pose_estimator->quat();
     Eigen::Vector4f ori(q.w(), q.x(), q.y(), q.z());
-    pose_estimator->predict(stamp, pose_estimator->pos(), ori);
+    pose_estimator->predict(stamp,
+                            pose_estimator->pos() + pose_estimator->vel(), ori);
 
     // correct
     auto filtered = downsample(cloud);

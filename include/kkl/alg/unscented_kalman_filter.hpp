@@ -6,21 +6,21 @@
 #ifndef KKL_UNSCENTED_KALMAN_FILTER_X_HPP
 #define KKL_UNSCENTED_KALMAN_FILTER_X_HPP
 
-#include <random>
 #include <Eigen/Dense>
+#include <random>
 
 namespace kkl {
-  namespace alg {
+namespace alg {
 
 /**
  * @brief Unscented Kalman Filter class
  * @param T        scaler type
  * @param System   system class to be estimated
  */
-template<typename T, class System>
-class UnscentedKalmanFilterX {
+template <typename T, class System> class UnscentedKalmanFilterX {
   typedef Eigen::Matrix<T, Eigen::Dynamic, 1> VectorXt;
   typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> MatrixXt;
+
 public:
   /**
    * @brief constructor
@@ -28,27 +28,22 @@ public:
    * @param state_dim            state vector dimension
    * @param input_dim            input vector dimension
    * @param measurement_dim      measurement vector dimension
-   * @param process_noise        process noise covariance (state_dim x state_dim)
-   * @param measurement_noise    measurement noise covariance (measurement_dim x measuremend_dim)
+   * @param process_noise        process noise covariance (state_dim x
+   * state_dim)
+   * @param measurement_noise    measurement noise covariance (measurement_dim x
+   * measuremend_dim)
    * @param mean                 initial mean
    * @param cov                  initial covariance
    */
-  UnscentedKalmanFilterX(const System& system, int state_dim, int input_dim, int measurement_dim, const MatrixXt& process_noise, const MatrixXt& measurement_noise, const VectorXt& mean, const MatrixXt& cov)
-    : state_dim(state_dim),
-    input_dim(input_dim),
-    measurement_dim(measurement_dim),
-    N(state_dim),
-    M(input_dim),
-    K(measurement_dim),
-    S(2 * state_dim + 1),
-    mean(mean),
-    cov(cov),
-    system(system),
-    process_noise(process_noise),
-    measurement_noise(measurement_noise),
-    lambda(1),
-    normal_dist(0.0, 1.0)
-  {
+  UnscentedKalmanFilterX(const System &system, int state_dim, int input_dim,
+                         int measurement_dim, const MatrixXt &process_noise,
+                         const MatrixXt &measurement_noise,
+                         const VectorXt &mean, const MatrixXt &cov)
+      : state_dim(state_dim), input_dim(input_dim),
+        measurement_dim(measurement_dim), N(state_dim), M(input_dim),
+        K(measurement_dim), S(2 * state_dim + 1), mean(mean), cov(cov),
+        system(system), process_noise(process_noise),
+        measurement_noise(measurement_noise), lambda(1), normal_dist(0.0, 1.0) {
     weights.resize(S, 1);
     sigma_points.resize(S, N);
     ext_weights.resize(2 * (N + K) + 1, 1);
@@ -72,7 +67,7 @@ public:
    * @brief predict
    * @param control  input vector
    */
-  void predict(const VectorXt& control) {
+  void predict(const VectorXt &control) {
     // calculate sigma points
     ensurePositiveFinite(cov);
     computeSigmaPoints(mean, cov, sigma_points);
@@ -80,7 +75,7 @@ public:
       sigma_points.row(i) = system.f(sigma_points.row(i), control);
     }
 
-    const auto& R = process_noise;
+    const auto &R = process_noise;
 
     // unscented transform
     VectorXt mean_pred(mean.size());
@@ -105,7 +100,7 @@ public:
    * @brief correct
    * @param measurement  measurement vector
    */
-  void correct(const VectorXt& measurement) {
+  void correct(const VectorXt &measurement) {
     // create extended state space which includes error variances
     VectorXt ext_mean_pred = VectorXt::Zero(N + K, 1);
     MatrixXt ext_cov_pred = MatrixXt::Zero(N + K, N + K);
@@ -119,17 +114,21 @@ public:
     // unscented transform
     expected_measurements.setZero();
     for (int i = 0; i < ext_sigma_points.rows(); i++) {
-      expected_measurements.row(i) = system.h(ext_sigma_points.row(i).transpose().topLeftCorner(N, 1));
-      expected_measurements.row(i) += VectorXt(ext_sigma_points.row(i).transpose().bottomRightCorner(K, 1));
+      expected_measurements.row(i) =
+          system.h(ext_sigma_points.row(i).transpose().topLeftCorner(N, 1));
+      expected_measurements.row(i) +=
+          VectorXt(ext_sigma_points.row(i).transpose().bottomRightCorner(K, 1));
     }
 
     VectorXt expected_measurement_mean = VectorXt::Zero(K);
     for (int i = 0; i < ext_sigma_points.rows(); i++) {
-      expected_measurement_mean += ext_weights[i] * expected_measurements.row(i);
+      expected_measurement_mean +=
+          ext_weights[i] * expected_measurements.row(i);
     }
     MatrixXt expected_measurement_cov = MatrixXt::Zero(K, K);
     for (int i = 0; i < ext_sigma_points.rows(); i++) {
-      VectorXt diff = expected_measurements.row(i).transpose() - expected_measurement_mean;
+      VectorXt diff =
+          expected_measurements.row(i).transpose() - expected_measurement_mean;
       expected_measurement_cov += ext_weights[i] * diff * diff.transpose();
     }
 
@@ -137,38 +136,53 @@ public:
     MatrixXt sigma = MatrixXt::Zero(N + K, K);
     for (int i = 0; i < ext_sigma_points.rows(); i++) {
       auto diffA = (ext_sigma_points.row(i).transpose() - ext_mean_pred);
-      auto diffB = (expected_measurements.row(i).transpose() - expected_measurement_mean);
+      auto diffB = (expected_measurements.row(i).transpose() -
+                    expected_measurement_mean);
       sigma += ext_weights[i] * (diffA * diffB.transpose());
     }
 
     kalman_gain = sigma * expected_measurement_cov.inverse();
-    const auto& K = kalman_gain;
+    const auto &K = kalman_gain;
 
-    VectorXt ext_mean = ext_mean_pred + K * (measurement - expected_measurement_mean);
-    MatrixXt ext_cov = ext_cov_pred - K * expected_measurement_cov * K.transpose();
+    VectorXt ext_mean =
+        ext_mean_pred + K * (measurement - expected_measurement_mean);
+    MatrixXt ext_cov =
+        ext_cov_pred - K * expected_measurement_cov * K.transpose();
 
     mean = ext_mean.topLeftCorner(N, 1);
     cov = ext_cov.topLeftCorner(N, N);
   }
 
   /*			getter			*/
-  const VectorXt& getMean() const { return mean; }
-  const MatrixXt& getCov() const { return cov; }
-  const MatrixXt& getSigmaPoints() const { return sigma_points; }
+  const VectorXt &getMean() const { return mean; }
+  const MatrixXt &getCov() const { return cov; }
+  const MatrixXt &getSigmaPoints() const { return sigma_points; }
 
-  System& getSystem() { return system; }
-  const System& getSystem() const { return system; }
-  const MatrixXt& getProcessNoiseCov() const { return process_noise; }
-  const MatrixXt& getMeasurementNoiseCov() const { return measurement_noise; }
+  System &getSystem() { return system; }
+  const System &getSystem() const { return system; }
+  const MatrixXt &getProcessNoiseCov() const { return process_noise; }
+  const MatrixXt &getMeasurementNoiseCov() const { return measurement_noise; }
 
-  const MatrixXt& getKalmanGain() const { return kalman_gain; }
+  const MatrixXt &getKalmanGain() const { return kalman_gain; }
 
   /*			setter			*/
-  UnscentedKalmanFilterX& setMean(const VectorXt& m) { mean = m;			return *this; }
-  UnscentedKalmanFilterX& setCov(const MatrixXt& s) { cov = s;			return *this; }
+  UnscentedKalmanFilterX &setMean(const VectorXt &m) {
+    mean = m;
+    return *this;
+  }
+  UnscentedKalmanFilterX &setCov(const MatrixXt &s) {
+    cov = s;
+    return *this;
+  }
 
-  UnscentedKalmanFilterX& setProcessNoiseCov(const MatrixXt& p) { process_noise = p;			return *this; }
-  UnscentedKalmanFilterX& setMeasurementNoiseCov(const MatrixXt& m) { measurement_noise = m;	return *this; }
+  UnscentedKalmanFilterX &setProcessNoiseCov(const MatrixXt &p) {
+    process_noise = p;
+    return *this;
+  }
+  UnscentedKalmanFilterX &setMeasurementNoiseCov(const MatrixXt &m) {
+    measurement_noise = m;
+    return *this;
+  }
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 private:
@@ -186,8 +200,8 @@ public:
   MatrixXt cov;
 
   System system;
-  MatrixXt process_noise;		//
-  MatrixXt measurement_noise;	//
+  MatrixXt process_noise;     //
+  MatrixXt measurement_noise; //
 
   T lambda;
   VectorXt weights;
@@ -205,7 +219,8 @@ private:
    * @param cov           covariance
    * @param sigma_points  calculated sigma points
    */
-  void computeSigmaPoints(const VectorXt& mean, const MatrixXt& cov, MatrixXt& sigma_points) {
+  void computeSigmaPoints(const VectorXt &mean, const MatrixXt &cov,
+                          MatrixXt &sigma_points) {
     const int n = mean.size();
     assert(cov.rows() == n && cov.cols() == n);
 
@@ -224,7 +239,7 @@ private:
    * @brief make covariance matrix positive finite
    * @param cov  covariance matrix
    */
-  void ensurePositiveFinite(MatrixXt& cov) {
+  void ensurePositiveFinite(MatrixXt &cov) {
     return;
     const double eps = 1e-9;
 
@@ -247,8 +262,7 @@ public:
   std::normal_distribution<T> normal_dist;
 };
 
-  }
-}
-
+} // namespace alg
+} // namespace kkl
 
 #endif
