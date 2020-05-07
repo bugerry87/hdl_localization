@@ -25,7 +25,7 @@
         name="Initializer"
         type="initializer.py"
         output="screen"
-        args="-g $(arg gps_topic) -i $(arg imu_topic) -m '/dynamic_map' -p $(arg points_topic) -o /odom -s /score -f $(arg map_frame_id) -r 0 -t -1.5 1.5 --min_score=0.1"
+        args="-g $(arg gps_topic) -i $(arg imu_topic) -m '/dynamic_map' -p $(arg points_topic) -o /odom -s /score -f $(arg map_frame_id) -r 0 -t -1.5 1.5 --min_score=0.001"
     />
 
     <!-- hdl_localization_nodelet -->

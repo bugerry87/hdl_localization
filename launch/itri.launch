@@ -13,6 +13,8 @@
     <arg name="map_frame_id" default="world" />
     <arg name="maps" default="[/share/itri/map.pcd]" />
     <arg name="map_resolution" default="2.0" />
+    <arg name="output" default="/share/eval_csv_" />
+    <arg name="ground_truth" default="/share/itri/ITRI_Public_Ground_Truth.csv" />
 
     <!-- in case you use velodyne_driver, comment out the following line -->
     <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen"/>
@@ -23,14 +25,14 @@
         name="Initializer"
         type="initializer.py"
         output="screen"
-        args="-g $(arg gps_topic) -i $(arg imu_topic) -m '/globalmap' -p $(arg points_topic) -o /odom -s /score -f $(arg map_frame_id) -r 40 -t -1.5 1.5 --min_score=0.1"
+        args="-g $(arg gps_topic) -m '/globalmap' -s /score -f $(arg map_frame_id) -r 40"
     />
 
     <!-- hdl_localization_nodelet -->
     <node pkg="nodelet" type="nodelet" name="hdl_localization_nodelet" args="load hdl_localization/HdlLocalizationNodelet $(arg nodelet_manager)">
         <remap from="/velodyne_points" to="$(arg points_topic)" />
         <remap from="/initialpose" to="Initializer/init" />
-        <remap from="/guesses" to="Initializer/guess" />
+        <!--<remap from="/guesses" to="Initializer/guess" />-->
         <!--<remap from="/globalmap" to="Initializer/submap" />-->
         <!-- odometry frame_id -->
         <param name="map_frame_id" value="$(arg map_frame_id)" />
@@ -58,4 +60,13 @@
         <param name="map_frame" value="$(arg map_frame_id)" />
         <param name="downsample_resolution" value="$(arg map_resolution)" />
     </node>
+
+    <!-- CSV Recorder -->
+    <node 
+        pkg="tools"
+        name="CSVRecorder"
+        type="ros2csv.py"
+        output="screen"
+        args="-t '/odom' -o $(arg output)"
+    />
 </launch>
